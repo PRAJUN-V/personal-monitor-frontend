@@ -1,5 +1,12 @@
 export interface UserProfile {
   username: string;
+  is_admin: boolean;
+}
+
+export interface ManagedUser {
+  id: number;
+  username: string;
+  is_admin: boolean;
 }
 
 export interface HealthRecord {

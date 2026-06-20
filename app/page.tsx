@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   HeartPulse,
   Settings as SettingsIcon,
+  Shield,
   Wallet,
   XCircle,
 } from "lucide-react";
@@ -21,12 +22,14 @@ import Login from "@/components/Login";
 import HealthMonitor from "@/components/HealthMonitor";
 import FinanceTracker from "@/components/FinanceTracker";
 import Settings from "@/components/Settings";
+import AdminPanel from "@/components/AdminPanel";
 
-type Tab = "health" | "finance" | "settings";
+type Tab = "health" | "finance" | "admin" | "settings";
 
-const TABS: { id: Tab; label: string; icon: typeof HeartPulse }[] = [
+const ALL_TABS: { id: Tab; label: string; icon: typeof HeartPulse; adminOnly?: boolean }[] = [
   { id: "health", label: "Health", icon: HeartPulse },
   { id: "finance", label: "Finance", icon: Wallet },
+  { id: "admin", label: "Users", icon: Shield, adminOnly: true },
   { id: "settings", label: "Settings", icon: SettingsIcon },
 ];
 
@@ -84,7 +87,7 @@ export default function Home() {
 
     const handleHashChange = () => {
       const hash = window.location.hash.replace("#", "") as Tab;
-      if (["health", "finance", "settings"].includes(hash)) setActiveTab(hash);
+      if (["health", "finance", "admin", "settings"].includes(hash)) setActiveTab(hash);
       else window.location.hash = "#health";
     };
     if (!window.location.hash) window.location.hash = "#health";
@@ -246,10 +249,18 @@ export default function Home() {
     }
   };
 
+  // If a non-admin lands on the admin tab (e.g. via #admin), send them home.
+  useEffect(() => {
+    if (isLoggedIn && userProfile && !userProfile.is_admin && activeTab === "admin") {
+      window.location.hash = "#health";
+    }
+  }, [isLoggedIn, userProfile, activeTab]);
+
   if (!ready) return null;
   if (!isLoggedIn) return <Login onLogin={handleLogin} isLoading={isLoading} error={error} />;
 
   const initial = userProfile?.username?.[0]?.toUpperCase() ?? "?";
+  const tabs = ALL_TABS.filter((t) => !t.adminOnly || userProfile?.is_admin);
 
   return (
     <div className="min-h-screen pb-32 md:pb-12">
@@ -267,7 +278,7 @@ export default function Home() {
 
           {/* Desktop segmented nav */}
           <nav className="hidden md:flex items-center gap-1 bg-slate-100/70 rounded-2xl p-1 border border-slate-200/60">
-            {TABS.map(({ id, label, icon: Icon }) => (
+            {tabs.map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
                 onClick={() => (window.location.hash = `#${id}`)}
@@ -322,6 +333,13 @@ export default function Home() {
             isFetching={isFetchingFinance}
           />
         )}
+        {activeTab === "admin" && userProfile?.is_admin && (
+          <AdminPanel
+            currentUsername={userProfile.username}
+            onNotify={showNotify}
+            onUnauthorized={handleLogout}
+          />
+        )}
         {activeTab === "settings" && <Settings userProfile={userProfile} onLogout={handleLogout} />}
       </main>
 
@@ -350,7 +368,7 @@ export default function Home() {
         className="md:hidden fixed left-1/2 -translate-x-1/2 w-[92%] max-w-sm glass rounded-2xl shadow-glow border border-white/60 p-1.5 flex justify-around items-center z-50"
         style={{ bottom: "calc(env(safe-area-inset-bottom) + 0.75rem)" }}
       >
-        {TABS.map(({ id, label, icon: Icon }) => (
+        {tabs.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
             onClick={() => (window.location.hash = `#${id}`)}

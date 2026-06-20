@@ -1,5 +1,6 @@
 import type {
   HealthRecord,
+  ManagedUser,
   Source,
   Transaction,
   UserProfile,
@@ -71,6 +72,17 @@ export const api = {
   },
 
   me: () => request<UserProfile>("/api/me"),
+
+  // Admin: user management
+  listUsers: () => request<ManagedUser[]>("/api/users"),
+  createUser: (payload: { username: string; password: string; is_admin: boolean }) =>
+    request<ManagedUser>("/api/users", { method: "POST", body: JSON.stringify(payload) }),
+  updateUser: (
+    id: number,
+    payload: { username?: string; password?: string; is_admin?: boolean },
+  ) => request<ManagedUser>(`/api/users/${id}`, { method: "PUT", body: JSON.stringify(payload) }),
+  deleteUser: (id: number) =>
+    request<{ message: string }>(`/api/users/${id}`, { method: "DELETE" }),
 
   // Health
   listHealth: (page: number, pageSize = 5) =>
