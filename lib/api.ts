@@ -98,6 +98,8 @@ export const api = {
   listSources: () => request<Source[]>("/api/sources"),
   createSource: (payload: { name: string; balance: number }) =>
     request<Source>("/api/sources", { method: "POST", body: JSON.stringify(payload) }),
+  updateSource: (id: number, payload: { name?: string; balance?: number }) =>
+    request<Source>(`/api/sources/${id}`, { method: "PUT", body: JSON.stringify(payload) }),
   listTransactions: (page: number, pageSize = 5) =>
     request<Transaction[]>(`/api/transactions?skip=${page * pageSize}&limit=${pageSize}`),
   createTransaction: (payload: unknown) =>

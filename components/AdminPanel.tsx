@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { api, UnauthorizedError } from "@/lib/api";
 import type { ManagedUser } from "@/lib/types";
+import ConfirmDialog from "./ConfirmDialog";
 
 interface AdminPanelProps {
   currentUsername: string;
@@ -40,6 +41,7 @@ export default function AdminPanel({ currentUsername, onNotify, onUnauthorized }
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<UserFormState>(emptyForm());
+  const [pendingDelete, setPendingDelete] = useState<ManagedUser | null>(null);
 
   const guard = useCallback(
     (err: unknown) => {
@@ -118,7 +120,6 @@ export default function AdminPanel({ currentUsername, onNotify, onUnauthorized }
   };
 
   const handleDelete = async (u: ManagedUser) => {
-    if (!window.confirm(`Delete user "${u.username}"? This cannot be undone.`)) return;
     try {
       await api.deleteUser(u.id);
       onNotify("User deleted");
@@ -265,7 +266,7 @@ export default function AdminPanel({ currentUsername, onNotify, onUnauthorized }
                     </button>
                     {!isSelf && (
                       <button
-                        onClick={() => handleDelete(u)}
+                        onClick={() => setPendingDelete(u)}
                         aria-label={`Delete ${u.username}`}
                         className="p-2 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 active:scale-90 transition"
                       >
@@ -285,6 +286,21 @@ export default function AdminPanel({ currentUsername, onNotify, onUnauthorized }
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="Delete user?"
+        message={
+          pendingDelete
+            ? `"${pendingDelete.username}" will be permanently deleted along with their data. This cannot be undone.`
+            : ""
+        }
+        onCancel={() => setPendingDelete(null)}
+        onConfirm={() => {
+          if (pendingDelete) handleDelete(pendingDelete);
+          setPendingDelete(null);
+        }}
+      />
     </div>
   );
 }

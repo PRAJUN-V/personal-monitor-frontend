@@ -16,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 import type { HealthRecord } from "@/lib/types";
+import ConfirmDialog from "./ConfirmDialog";
 
 interface HealthMonitorProps {
   records: HealthRecord[];
@@ -90,6 +91,7 @@ export default function HealthMonitor({
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<HealthFormState>(emptyForm());
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -247,7 +249,7 @@ export default function HealthMonitor({
                     <button onClick={() => startEdit(r)} className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition">
                       <Pencil className="w-4 h-4" />
                     </button>
-                    <button onClick={() => onDelete(r.id)} className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition">
+                    <button onClick={() => setDeleteId(r.id)} className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -308,7 +310,7 @@ export default function HealthMonitor({
                       <button onClick={() => startEdit(r)} className="p-2 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition">
                         <Pencil className="w-4 h-4" />
                       </button>
-                      <button onClick={() => onDelete(r.id)} className="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition">
+                      <button onClick={() => setDeleteId(r.id)} className="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -345,6 +347,17 @@ export default function HealthMonitor({
           </button>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={deleteId !== null}
+        title="Delete record?"
+        message="This health record will be permanently removed. This action cannot be undone."
+        onCancel={() => setDeleteId(null)}
+        onConfirm={() => {
+          if (deleteId !== null) onDelete(deleteId);
+          setDeleteId(null);
+        }}
+      />
     </div>
   );
 }

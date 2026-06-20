@@ -210,6 +210,25 @@ export default function Home() {
     }
   };
 
+  const handleUpdateSource = async (
+    id: number,
+    form: { name: string; balance: string },
+  ): Promise<boolean> => {
+    setIsSaving(true);
+    try {
+      await api.updateSource(id, { name: form.name, balance: parseFloat(form.balance) || 0 });
+      // Refresh transactions too, since a renamed source shows in the activity feed.
+      await Promise.all([fetchSources(), fetchTransactions()]);
+      showNotify("Source updated");
+      return true;
+    } catch (err) {
+      if (!guard(err)) showNotify("Failed to update source", "error");
+      return false;
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleAddTransaction = async (form: {
     source_id: string;
     amount: string;
@@ -327,6 +346,7 @@ export default function Home() {
             page={transPage}
             onPageChange={setTransPage}
             onAddSource={handleAddSource}
+            onUpdateSource={handleUpdateSource}
             onAddTransaction={handleAddTransaction}
             onDeleteTransaction={handleTransDelete}
             isSaving={isSaving}

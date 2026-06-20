@@ -6,6 +6,7 @@ import {
   ArrowUpRight,
   ChevronLeft,
   ChevronRight,
+  Pencil,
   Plus,
   Receipt,
   Trash2,
@@ -13,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import type { Source, Transaction } from "@/lib/types";
+import ConfirmDialog from "./ConfirmDialog";
 
 interface FinanceTrackerProps {
   sources: Source[];
@@ -20,6 +22,7 @@ interface FinanceTrackerProps {
   page: number;
   onPageChange: (page: number) => void;
   onAddSource: (form: { name: string; balance: string }) => Promise<boolean>;
+  onUpdateSource: (id: number, form: { name: string; balance: string }) => Promise<boolean>;
   onAddTransaction: (payload: TransactionPayload) => Promise<boolean>;
   onDeleteTransaction: (id: number) => void;
   isSaving: boolean;
@@ -84,6 +87,7 @@ export default function FinanceTracker({
   page,
   onPageChange,
   onAddSource,
+  onUpdateSource,
   onAddTransaction,
   onDeleteTransaction,
   isSaving,
@@ -92,15 +96,34 @@ export default function FinanceTracker({
   const [showSourceForm, setShowSourceForm] = useState(false);
   const [showTransForm, setShowTransForm] = useState(false);
   const [sourceForm, setSourceForm] = useState({ name: "", balance: "" });
+  const [editingSourceId, setEditingSourceId] = useState<number | null>(null);
+  const [deleteTxId, setDeleteTxId] = useState<number | null>(null);
   const [transForm, setTransForm] = useState(emptyTransForm());
 
   const totalBalance = sources.reduce((sum, s) => sum + s.balance, 0);
 
+  const openAddSource = () => {
+    setEditingSourceId(null);
+    setSourceForm({ name: "", balance: "" });
+    setShowSourceForm(true);
+    setShowTransForm(false);
+  };
+
+  const startEditSource = (s: Source) => {
+    setEditingSourceId(s.id);
+    setSourceForm({ name: s.name, balance: String(s.balance) });
+    setShowSourceForm(true);
+    setShowTransForm(false);
+  };
+
   const handleSourceSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await onAddSource(sourceForm);
+    const success = editingSourceId
+      ? await onUpdateSource(editingSourceId, sourceForm)
+      : await onAddSource(sourceForm);
     if (success) {
       setShowSourceForm(false);
+      setEditingSourceId(null);
       setSourceForm({ name: "", balance: "" });
     }
   };
@@ -152,17 +175,21 @@ export default function FinanceTracker({
           </>
         ) : (
           sources.map((s) => (
-            <div key={s.id} className="bg-white p-4 rounded-2xl shadow-soft border border-slate-100 border-l-4 border-l-indigo-500">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate">{s.name}</p>
+            <div key={s.id} className="group relative bg-white p-4 rounded-2xl shadow-soft border border-slate-100 border-l-4 border-l-indigo-500">
+              <button
+                onClick={() => startEditSource(s)}
+                aria-label={`Edit ${s.name}`}
+                className="absolute top-2 right-2 p-1.5 rounded-lg text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 active:scale-90 transition md:opacity-0 md:group-hover:opacity-100"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+              </button>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate pr-6">{s.name}</p>
               <p className="text-xl font-extrabold text-slate-900 mt-1">₹{s.balance.toLocaleString()}</p>
             </div>
           ))
         )}
         <button
-          onClick={() => {
-            setShowSourceForm(true);
-            setShowTransForm(false);
-          }}
+          onClick={openAddSource}
           className="border-2 border-dashed border-slate-200 p-4 rounded-2xl text-slate-400 hover:border-indigo-400 hover:text-indigo-500 hover:bg-indigo-50/40 transition flex flex-col items-center justify-center gap-1.5 min-h-[80px]"
         >
           <Plus className="w-5 h-5" />
@@ -174,11 +201,18 @@ export default function FinanceTracker({
       {(showSourceForm || showTransForm) && (
         <div className="glass-dark rounded-3xl p-6 text-white shadow-glow animate-scale-in border border-white/10">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-bold">{showSourceForm ? "New Money Source" : "New Transaction"}</h2>
+            <h2 className="text-lg font-bold">
+              {showSourceForm
+                ? editingSourceId
+                  ? "Edit Money Source"
+                  : "New Money Source"
+                : "New Transaction"}
+            </h2>
             <button
               onClick={() => {
                 setShowSourceForm(false);
                 setShowTransForm(false);
+                setEditingSourceId(null);
               }}
               className="text-white/60 hover:text-white transition p-1"
             >
@@ -194,12 +228,23 @@ export default function FinanceTracker({
                   <input type="text" required className={darkInput} placeholder="e.g. Cash" value={sourceForm.name} onChange={(e) => setSourceForm({ ...sourceForm, name: e.target.value })} />
                 </div>
                 <div>
-                  <label className={darkLabel}>Initial Balance</label>
+                  <label className={darkLabel}>{editingSourceId ? "Balance" : "Initial Balance"}</label>
                   <input type="number" inputMode="decimal" required className={darkInput} placeholder="0.00" value={sourceForm.balance} onChange={(e) => setSourceForm({ ...sourceForm, balance: e.target.value })} />
                 </div>
               </div>
+              {editingSourceId && (
+                <p className="text-xs text-indigo-200/80">
+                  Editing the balance directly corrects the amount — it does not create a transaction.
+                </p>
+              )}
               <button type="submit" disabled={isSaving} className="w-full bg-white text-indigo-900 font-bold py-3 rounded-xl hover:bg-indigo-50 transition disabled:opacity-60">
-                {isSaving ? "Creating..." : "Create Source"}
+                {isSaving
+                  ? editingSourceId
+                    ? "Saving..."
+                    : "Creating..."
+                  : editingSourceId
+                    ? "Save Changes"
+                    : "Create Source"}
               </button>
             </form>
           ) : (
@@ -260,6 +305,7 @@ export default function FinanceTracker({
             onClick={() => {
               setShowTransForm(true);
               setShowSourceForm(false);
+              setEditingSourceId(null);
             }}
             className="flex items-center gap-1.5 bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lift transition hover:bg-emerald-700 active:scale-[0.98]"
           >
@@ -298,7 +344,7 @@ export default function FinanceTracker({
                     {t.type === "income" ? "+" : "-"} ₹{t.amount.toLocaleString()}
                   </p>
                   <button
-                    onClick={() => onDeleteTransaction(t.id)}
+                    onClick={() => setDeleteTxId(t.id)}
                     aria-label="Delete transaction"
                     className="p-2 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 active:scale-90 transition md:opacity-0 md:group-hover:opacity-100"
                   >
@@ -334,6 +380,17 @@ export default function FinanceTracker({
           </button>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={deleteTxId !== null}
+        title="Delete transaction?"
+        message="This transaction will be removed and the source balance will be adjusted back. This cannot be undone."
+        onCancel={() => setDeleteTxId(null)}
+        onConfirm={() => {
+          if (deleteTxId !== null) onDeleteTransaction(deleteTxId);
+          setDeleteTxId(null);
+        }}
+      />
     </div>
   );
 }
