@@ -54,3 +54,29 @@ lib/
   api.ts          Fetch client + token helpers
   types.ts        Shared TypeScript types
 ```
+
+## Deployment (Netlify) & CI/CD
+
+This repo deploys to **Netlify** and runs CI on **GitHub Actions**.
+
+### One-time setup
+
+1. Push this repo to GitHub.
+2. On Netlify: **Add new site → Import from Git**, connect the repo. Netlify
+   reads `netlify.toml` (build command, Node version, and the official
+   `@netlify/plugin-nextjs` runtime) automatically.
+3. Set the environment variable **`NEXT_PUBLIC_API_URL`** (Site settings →
+   Environment variables) to your Render backend URL, e.g.
+   `https://personal-monitor-backend.onrender.com`. This is inlined at build
+   time, so a redeploy is needed if you change it.
+4. Add your Netlify site URL to the backend's `CORS_ORIGINS` on Render.
+
+### How CI/CD works
+
+- `.github/workflows/ci.yml` runs on every push/PR to `main`: `npm ci`,
+  `npm run lint`, and `npm run build`.
+- **Deploy** is handled by Netlify's native auto-deploy on push to `main`.
+- *(Optional, gated deploy)* To only deploy after CI passes: turn **off**
+  automatic builds in Netlify, create a **Build Hook** URL, and add it as a
+  GitHub Actions secret named `NETLIFY_BUILD_HOOK_URL`. You can also set
+  `NEXT_PUBLIC_API_URL` as a repo secret so CI builds against the real backend.

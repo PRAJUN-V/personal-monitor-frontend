@@ -1,0 +1,53 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Lint & build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        env:
+          # Build-time API URL. Set NEXT_PUBLIC_API_URL as a repo secret to
+          # validate the real backend URL; otherwise a placeholder is used.
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'http://localhost:8000' }}
+        run: npm run build
+
+  deploy:
+    name: Deploy to Netlify
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      # Optional gated deploy: only runs if you add a NETLIFY_BUILD_HOOK_URL
+      # secret AND turn off automatic builds on Netlify. Otherwise Netlify's
+      # native auto-deploy handles it and this step is a no-op.
+      - name: Trigger Netlify build hook
+        env:
+          HOOK: ${{ secrets.NETLIFY_BUILD_HOOK_URL }}
+        run: |
+          if [ -n "$HOOK" ]; then
+            echo "Triggering Netlify build..."
+            curl -fsSL -X POST -d '{}' "$HOOK"
+          else
+            echo "No NETLIFY_BUILD_HOOK_URL set; relying on Netlify native auto-deploy."
+          fi

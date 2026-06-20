@@ -1,0 +1,18 @@
+# Netlify configuration for the Personal Monitor frontend (Next.js).
+# This repo is the root of the frontend, so no "base" directory is needed.
+# Connect this GitHub repo in Netlify; it auto-deploys on each push.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # NEXT_PUBLIC_API_URL is read at BUILD time and inlined into the bundle.
+  # Set it in the Netlify UI (Site settings > Environment variables) to your
+  # Render backend URL, e.g. https://personal-monitor-backend.onrender.com
+
+# Official Next.js runtime — enables SSR, image optimization, and routing.
+# Netlify installs this automatically when referenced here.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
