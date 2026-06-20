@@ -2,9 +2,9 @@ name: Frontend CI
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
   build:
@@ -35,7 +35,7 @@ jobs:
   deploy:
     name: Deploy to Netlify
     needs: build
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       # Optional gated deploy: only runs if you add a NETLIFY_BUILD_HOOK_URL

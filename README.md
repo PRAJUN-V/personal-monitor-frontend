@@ -73,9 +73,9 @@ This repo deploys to **Netlify** and runs CI on **GitHub Actions**.
 
 ### How CI/CD works
 
-- `.github/workflows/ci.yml` runs on every push/PR to `main`: `npm ci`,
+- `.github/workflows/ci.yml` runs on every push/PR to `master`: `npm ci`,
   `npm run lint`, and `npm run build`.
-- **Deploy** is handled by Netlify's native auto-deploy on push to `main`.
+- **Deploy** is handled by Netlify's native auto-deploy on push to `master`.
 - *(Optional, gated deploy)* To only deploy after CI passes: turn **off**
   automatic builds in Netlify, create a **Build Hook** URL, and add it as a
   GitHub Actions secret named `NETLIFY_BUILD_HOOK_URL`. You can also set
