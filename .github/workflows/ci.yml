@@ -25,6 +25,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Test
+        run: npm run test
+
       - name: Build
         env:
           # Build-time API URL. Set NEXT_PUBLIC_API_URL as a repo secret to

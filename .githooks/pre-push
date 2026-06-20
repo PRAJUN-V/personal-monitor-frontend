@@ -1,0 +1,12 @@
+#!/bin/sh
+# Pre-push hook: lint and run the frontend test suite before allowing a push.
+# Enable once per clone with:  git config core.hooksPath .githooks
+set -e
+
+echo "[pre-push] Linting frontend..."
+npm run lint
+
+echo "[pre-push] Running frontend tests..."
+npm run test
+
+echo "[pre-push] Frontend checks passed. Proceeding with push."

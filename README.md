@@ -37,6 +37,8 @@ Open http://localhost:3000. Make sure the backend is running on the URL above an
 - `npm run build` — production build
 - `npm run start` — serve the production build
 - `npm run lint` — lint
+- `npm run test` — run unit tests once (Vitest)
+- `npm run test:watch` — run tests in watch mode
 
 ## Structure
 
@@ -54,6 +56,31 @@ lib/
   api.ts          Fetch client + token helpers
   types.ts        Shared TypeScript types
 ```
+
+## Testing
+
+Unit tests use **Vitest** + **React Testing Library** (jsdom environment).
+
+```bash
+npm run test          # run once
+npm run test:watch    # watch mode
+```
+
+Current coverage: the API client (token handling, login, 401 behavior, auth
+headers) and the `Login` component.
+
+### Run checks automatically before every push
+
+A `pre-push` git hook lives in `.githooks/`. Enable it once per clone:
+
+```bash
+git config core.hooksPath .githooks
+# macOS/Linux only: make it executable
+chmod +x .githooks/pre-push
+```
+
+`git push` then runs `npm run lint` and `npm run test` first, aborting the push
+if anything fails.
 
 ## Deployment (Netlify) & CI/CD
 
@@ -74,7 +101,7 @@ This repo deploys to **Netlify** and runs CI on **GitHub Actions**.
 ### How CI/CD works
 
 - `.github/workflows/ci.yml` runs on every push/PR to `master`: `npm ci`,
-  `npm run lint`, and `npm run build`.
+  `npm run lint`, `npm run test`, and `npm run build`.
 - **Deploy** is handled by Netlify's native auto-deploy on push to `master`.
 - *(Optional, gated deploy)* To only deploy after CI passes: turn **off**
   automatic builds in Netlify, create a **Build Hook** URL, and add it as a
