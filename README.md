@@ -57,6 +57,25 @@ lib/
   types.ts        Shared TypeScript types
 ```
 
+## Install as a mobile app (PWA)
+
+The app is a Progressive Web App, so it can be installed to a phone's home
+screen and launched full-screen like a native app.
+
+- **Files:** `public/manifest.webmanifest`, app icons in `public/` (`icon.svg`,
+  `icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `apple-touch-icon.png`),
+  a service worker at `public/sw.js`, and `components/PWARegister.tsx` (registers
+  the worker). Metadata (manifest link, theme color, Apple meta) is set in
+  `app/layout.tsx`.
+- **Requirements:** PWAs install only over HTTPS (Netlify provides this) — it
+  won't be installable from plain `http://localhost`.
+
+### How users install it
+
+- **Android / Chrome:** open the site → menu (⋮) → **Add to Home screen / Install app**
+  (an install prompt may also appear automatically).
+- **iOS / Safari:** open the site → **Share** → **Add to Home Screen**.
+
 ## Testing
 
 Unit tests use **Vitest** + **React Testing Library** (jsdom environment).
