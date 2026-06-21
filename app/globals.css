@@ -5,32 +5,37 @@
 :root {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, sans-serif;
+  --bg-base: #09090b;
+  --bg-elevated: #18181b;
+  --bg-surface: #1c1c21;
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.1);
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --accent: #d4d4d8;
 }
 
 html {
   font-family: var(--font-sans);
-  /* Remove the grey tap flash on touch devices */
+  color-scheme: dark;
   -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  color: #0f172a;
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   min-height: 100vh;
-  /* Prevent accidental horizontal scrolling on small screens */
   overflow-x: hidden;
-  /* Soft, modern ambient gradient backdrop */
-  background-color: #f6f7fb;
+  background-color: var(--bg-base);
   background-image:
-    radial-gradient(1100px 700px at 100% -10%, rgba(99, 102, 241, 0.12), transparent 55%),
-    radial-gradient(900px 600px at -10% 0%, rgba(168, 85, 247, 0.1), transparent 50%),
-    radial-gradient(800px 800px at 50% 120%, rgba(16, 185, 129, 0.08), transparent 55%);
+    radial-gradient(1200px 800px at 100% -20%, rgba(255, 255, 255, 0.03), transparent 55%),
+    radial-gradient(900px 700px at -10% 0%, rgba(161, 161, 170, 0.04), transparent 50%),
+    radial-gradient(800px 800px at 50% 120%, rgba(16, 185, 129, 0.04), transparent 55%);
   background-attachment: fixed;
 }
 
-/* iOS zooms in when a focused input's font-size is < 16px. Force 16px on
-   small screens so focusing a field never triggers an unwanted zoom. */
 @media (max-width: 640px) {
   input,
   select,
@@ -39,14 +44,12 @@ body {
   }
 }
 
-/* Snappier taps: removes the legacy 300ms delay and improves responsiveness */
 button,
 a,
 [role="button"] {
   touch-action: manipulation;
 }
 
-/* Respect notch / home-indicator safe areas */
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom);
 }
@@ -55,44 +58,64 @@ a,
   margin-bottom: env(safe-area-inset-bottom);
 }
 
-/* Glassmorphism surface used by nav + floating elements */
 .glass {
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(24, 24, 27, 0.82);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
 }
 
 .glass-dark {
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(24, 24, 27, 0.95);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
 }
 
-/* Brand gradient helpers */
 .brand-gradient {
-  background-image: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+  background-image: linear-gradient(135deg, #18181b 0%, #27272a 45%, #3f3f46 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .text-gradient {
-  background-image: linear-gradient(135deg, #4f46e5, #9333ea);
+  background-image: linear-gradient(135deg, #e4e4e7, #fafafa);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
-/* Refined custom scrollbar */
+@layer components {
+  .surface {
+    @apply bg-zinc-900/90 border border-zinc-800/80 rounded-3xl shadow-soft;
+  }
+
+  .surface-inner {
+    @apply bg-zinc-900 border border-zinc-800 rounded-2xl shadow-soft;
+  }
+
+  .input-field {
+    @apply w-full bg-zinc-950/80 px-3 py-2.5 rounded-xl border border-zinc-700/80 text-sm font-medium text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-zinc-500 focus:ring-4 focus:ring-zinc-700/40;
+  }
+
+  .label-field {
+    @apply text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5 block;
+  }
+
+  .btn-primary {
+    @apply brand-gradient text-white font-bold rounded-xl shadow-lift transition hover:opacity-95 active:scale-[0.98] disabled:opacity-60;
+  }
+}
+
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.35);
+  background: rgba(113, 113, 122, 0.45);
   border-radius: 9999px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.55);
+  background: rgba(161, 161, 170, 0.55);
   background-clip: content-box;
 }
 

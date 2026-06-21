@@ -284,27 +284,27 @@ export default function Home() {
   return (
     <div className="min-h-screen pb-32 md:pb-12">
       {/* Header */}
-      <header className="sticky top-0 z-30 glass border-b border-white/50">
+      <header className="sticky top-0 z-30 glass border-b border-zinc-800/80">
         <div className="max-w-5xl mx-auto flex items-center justify-between gap-4 px-4 py-3">
           <div className="flex items-center gap-2.5">
             <div className="brand-gradient p-2 rounded-xl shadow-lift">
               <Activity className="w-5 h-5 text-white" strokeWidth={2.5} />
             </div>
-            <span className="font-extrabold text-slate-900 tracking-tight text-lg">
+            <span className="font-extrabold text-zinc-50 tracking-tight text-lg">
               Monitor
             </span>
           </div>
 
           {/* Desktop segmented nav */}
-          <nav className="hidden md:flex items-center gap-1 bg-slate-100/70 rounded-2xl p-1 border border-slate-200/60">
+          <nav className="hidden md:flex items-center gap-1 bg-zinc-900/80 rounded-2xl p-1 border border-zinc-800/80">
             {tabs.map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
                 onClick={() => (window.location.hash = `#${id}`)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition ${
                   activeTab === id
-                    ? "bg-white text-indigo-600 shadow-soft"
-                    : "text-slate-500 hover:text-slate-800"
+                    ? "bg-zinc-800 text-zinc-50 shadow-soft"
+                    : "text-zinc-500 hover:text-zinc-200"
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -315,10 +315,10 @@ export default function Home() {
 
           <div className="flex items-center gap-3">
             <div className="hidden sm:block text-right leading-tight">
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+              <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
                 Signed in
               </p>
-              <p className="text-sm font-bold text-slate-700">{userProfile?.username}</p>
+              <p className="text-sm font-bold text-zinc-200">{userProfile?.username}</p>
             </div>
             <div className="brand-gradient w-9 h-9 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-lift">
               {initial}
@@ -369,23 +369,23 @@ export default function Home() {
           <div
             className={`p-4 rounded-2xl shadow-glow border flex items-center gap-3 ${
               notification.type === "success"
-                ? "bg-white border-emerald-100"
-                : "bg-white border-rose-100"
+                ? "bg-zinc-900 border-emerald-900/60"
+                : "bg-zinc-900 border-rose-900/60"
             }`}
           >
             {notification.type === "success" ? (
-              <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
             ) : (
-              <XCircle className="w-5 h-5 text-rose-500 shrink-0" />
+              <XCircle className="w-5 h-5 text-rose-400 shrink-0" />
             )}
-            <p className="text-sm font-bold text-slate-700">{notification.message}</p>
+            <p className="text-sm font-bold text-zinc-200">{notification.message}</p>
           </div>
         </div>
       )}
 
       {/* Floating mobile nav (safe-area aware) */}
       <div
-        className="md:hidden fixed left-1/2 -translate-x-1/2 w-[92%] max-w-sm glass rounded-2xl shadow-glow border border-white/60 p-1.5 flex justify-around items-center z-50"
+        className="md:hidden fixed left-1/2 -translate-x-1/2 w-[92%] max-w-sm glass rounded-2xl shadow-glow border border-zinc-800/80 p-1.5 flex justify-around items-center z-50"
         style={{ bottom: "calc(env(safe-area-inset-bottom) + 0.75rem)" }}
       >
         {tabs.map(({ id, label, icon: Icon }) => (
@@ -395,7 +395,7 @@ export default function Home() {
             className={`flex-1 flex flex-col items-center justify-center gap-1 min-h-[52px] rounded-xl transition active:scale-95 ${
               activeTab === id
                 ? "brand-gradient text-white shadow-lift"
-                : "text-slate-400 hover:text-slate-600"
+                : "text-zinc-500 hover:text-zinc-300"
             }`}
           >
             <Icon className="w-[22px] h-[22px]" />

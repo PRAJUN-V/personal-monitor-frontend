@@ -11,9 +11,9 @@ const config: Config = {
         sans: ["var(--font-inter)", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        soft: "0 1px 2px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.06)",
-        lift: "0 10px 30px -10px rgba(79,70,229,0.35)",
-        glow: "0 0 0 1px rgba(99,102,241,0.1), 0 20px 50px -20px rgba(99,102,241,0.45)",
+        soft: "0 1px 2px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.35)",
+        lift: "0 10px 30px -10px rgba(0,0,0,0.55)",
+        glow: "0 0 0 1px rgba(255,255,255,0.06), 0 20px 50px -20px rgba(0,0,0,0.65)",
       },
       keyframes: {
         "fade-in-up": {
