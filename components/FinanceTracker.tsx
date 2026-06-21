@@ -13,6 +13,12 @@ import {
   Wallet,
   X,
 } from "lucide-react";
+import {
+  formatIndianDate,
+  formatIndianTime,
+  getCurrentIndianDateTime,
+  indianDateTimeToUtcIso,
+} from "@/lib/datetime";
 import type { Source, Transaction } from "@/lib/types";
 import ConfirmDialog from "./ConfirmDialog";
 
@@ -38,18 +44,12 @@ interface TransactionPayload {
   date: string;
 }
 
-function getCurrentLocalDateTime() {
-  const now = new Date();
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-  return now.toISOString().slice(0, 16);
-}
-
 const emptyTransForm = () => ({
   source_id: "",
   amount: "",
   type: "expense",
   category: "",
-  datetime: getCurrentLocalDateTime(),
+  datetime: getCurrentIndianDateTime(),
   description: "",
 });
 
@@ -136,7 +136,7 @@ export default function FinanceTracker({
       type: transForm.type,
       category: transForm.category,
       description: transForm.description,
-      date: new Date(transForm.datetime).toISOString(),
+      date: indianDateTimeToUtcIso(transForm.datetime),
     };
     const success = await onAddTransaction(payload);
     if (success) {
@@ -145,7 +145,7 @@ export default function FinanceTracker({
     }
   };
 
-  const setTimeToNow = () => setTransForm({ ...transForm, datetime: getCurrentLocalDateTime() });
+  const setTimeToNow = () => setTransForm({ ...transForm, datetime: getCurrentIndianDateTime() });
 
   return (
     <div className="space-y-8">
@@ -276,7 +276,7 @@ export default function FinanceTracker({
                 </div>
                 <div>
                   <div className="flex justify-between items-center mb-1.5">
-                    <label className="text-xs font-bold text-indigo-200 block">Date &amp; Time</label>
+                    <label className="text-xs font-bold text-indigo-200 block">Date &amp; Time (IST)</label>
                     <button type="button" onClick={setTimeToNow} className="text-[10px] font-bold text-indigo-300 hover:text-white uppercase tracking-tight transition">
                       Set Now
                     </button>
@@ -333,8 +333,7 @@ export default function FinanceTracker({
                       <span className="truncate">{t.source_name}</span>
                       <span>•</span>
                       <span className="whitespace-nowrap">
-                        {new Date(t.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}{" "}
-                        {new Date(t.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        {formatIndianDate(t.date)} {formatIndianTime(t.date)}
                       </span>
                     </div>
                   </div>
